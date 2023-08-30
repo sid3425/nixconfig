@@ -33,7 +33,7 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
-
+  hardware.bluetooth.enable = true;
   # Set your time zone.
   time.timeZone = "Asia/Kolkata";
 
@@ -55,9 +55,11 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  # Enable the Plasma Desktop Environment.
+  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.desktopManager.plasma5.enable = true;
+  services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
+  services.xserver.displayManager.defaultSession = "plasmawayland";
 
   # Configure keymap in X11
   services.xserver = {
@@ -86,7 +88,7 @@
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.sid = {
@@ -95,12 +97,12 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       librewolf
-      gimp
+      krita
       obs-studio
       inkscape
       kdenlive
       megasync
-      fragments
+      qbittorrent
       veracrypt
       brave
       freetube
@@ -108,7 +110,6 @@
       zoom-us
       bitwarden
       vlc
-      gnome.gnome-tweaks
       audacity
       adw-gtk3
     ];
@@ -116,6 +117,9 @@
   
   # Enable FLatpak
   services.flatpak.enable = true;
+
+  #Enable KDEConnect
+  programs.kdeconnect.enable = true;
   
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -147,6 +151,7 @@
     ncurses5
     stdenv.cc
     binutils
+    zsh
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -163,10 +168,15 @@
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+    networking.firewall = { 
+    enable = true;
+    allowedTCPPortRanges = [ 
+      { from = 1714; to = 1764; } # KDE Connect
+    ];  
+    allowedUDPPortRanges = [ 
+      { from = 1714; to = 1764; } # KDE Connect
+    ];  
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
