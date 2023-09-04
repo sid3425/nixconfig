@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./amd-nvidia.nix
+      ./podman-shell.nix
     ];
 
   # Bootloader.
@@ -24,7 +25,7 @@
   boot.initrd.luks.devices."luks-7dc8106d-ab52-4860-a335-b9eac77446bc".device = "/dev/disk/by-uuid/7dc8106d-ab52-4860-a335-b9eac77446bc";
   boot.initrd.luks.devices."luks-7dc8106d-ab52-4860-a335-b9eac77446bc".keyFile = "/crypto_keyfile.bin";
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "MySystem"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -111,7 +112,15 @@
       bitwarden
       vlc
       audacity
-      adw-gtk3
+      libreoffice-qt
+      libsForQt5.kclock
+      libsForQt5.kate
+      libsForQt5.keysmith
+      libsForQt5.kalk
+      popsicle
+      libsForQt5.kamoso
+      gparted
+      libsForQt5.kalendar
     ];
   };
   
@@ -155,6 +164,14 @@
     stdenv.cc
     binutils
     zsh
+    polkit
+    pipx
+    appimage-run
+    syncthing
+    syncthingtray
+    android-tools
+    inter
+    jetbrains-mono
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -179,6 +196,21 @@
     allowedUDPPortRanges = [ 
       { from = 1714; to = 1764; } # KDE Connect
     ];  
+  };
+
+  #Reduce swappiness
+  boot.kernel.sysctl = { "vm.swappiness" = 10;};
+
+  # Auto system update
+  system.autoUpgrade = {
+      enable = true;
+  };
+
+  # Automatic Garbage Collection
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 2d";
   };
 
   # This value determines the NixOS release from which the default
