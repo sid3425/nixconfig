@@ -5,14 +5,14 @@ This is my system configuration based on the NixOS Linux Distribution. While thi
 # Usage
 1. Download and install [NixOS](https://nixos.org/download) either on a VM or on bare metal.
 2. Post-installation, download the files using the green colored Code button at the top of this page.
-3. Now, extract the .zip file, and copy-paste the files in the ''' /etc/nixos ''' directory.
+3. Now, extract the .zip file, and copy-paste the files in the ' /etc/nixos ' directory.
 4. After pasting the files, make sure to edit them based on your needs.
-5. Post editing, run the command ''' sudo nixos-rebuild switch ''' and once the process is completed, reboot the system.
+5. Post editing, run the command ' sudo nixos-rebuild switch ' and once the process is completed, reboot the system.
 
 
 # Features
-1. Hybrid graphics support with Nvidia GPUs for laptops(Change the PCI ID's specific to your integrated and dedicated GPUs in the ''' amd-nvidia.nix ''' file. If not needed, do not use the file and remove the link from the ''' configuration.nix ''' file)
-2. Containerization support using [Podman](https://docs.podman.io/en/latest/) (make sure to add the '''podman.nix''' file to the ''' /etc/nixos directory ''' as well)
+1. Hybrid graphics support with Nvidia GPUs for laptops(Change the PCI ID's specific to your integrated and dedicated GPUs in the ' amd-nvidia.nix ' file. If not needed, do not use the file and remove the link from the ' configuration.nix ' file)
+2. Containerization support using [Podman](https://docs.podman.io/en/latest/) (make sure to add the '''podman.nix''' file to the ' /etc/nixos directory ' as well)
 3. Created a full desktop experience using the KDE Plasma desktop environment
 4. Fonts such as JetBrains Mono(for the command line) and Inter(for the GUI) are included by default
 5. Developer friendly(ish) with packages such as gcc, python3, pip, git etc. included by default ;)
