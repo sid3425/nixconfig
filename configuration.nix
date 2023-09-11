@@ -9,13 +9,12 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./amd-nvidia.nix
-      ./podman-shell.nix
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
+  
   # Setup keyfile
   boot.initrd.secrets = {
     "/crypto_keyfile.bin" = null;
@@ -35,6 +34,7 @@
   # Enable networking
   networking.networkmanager.enable = true;
   hardware.bluetooth.enable = true;
+  systemd.services.NetworkManager-wait-online.enable = false;
   # Set your time zone.
   time.timeZone = "Asia/Kolkata";
 
@@ -108,7 +108,6 @@
       brave
       freetube
       steam
-      zoom-us
       bitwarden
       vlc
       audacity
@@ -123,19 +122,28 @@
       libsForQt5.kalendar
     ];
   };
-  
-  # Enable FLatpak
   services.flatpak.enable = true;
-
-  #Enable KDEConnect
   programs.kdeconnect.enable = true;
-  
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-  
-  #Enable VirtualBox
-  virtualisation.virtualbox.host.enable = true;
   users.extraGroups.vboxusers.members = [ "user-with-access-to-virtualbox" ];
+  virtualisation = {
+    podman = {
+      enable = true;
+
+      # Create a `docker` alias for podman, to use it as a drop-in replacement
+      dockerCompat = true;
+
+      # Required for containers under podman-compose to be able to talk to each other.
+      defaultNetwork.settings.dns_enabled = true;
+      # For Nixos version > 22.11
+      #defaultNetwork.settings = {
+      #  dns_enabled = true;
+      #};
+    };
+    virtualbox = {
+      host.enable = true;
+    };
+  };
 
   #Enable auto-cpufreq for power management
   services.auto-cpufreq.enable = true;
@@ -143,7 +151,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    neovim
     wget
     curl
     python3
@@ -172,6 +180,7 @@
     android-tools
     inter
     jetbrains-mono
+    fira
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -201,12 +210,11 @@
   #Reduce swappiness
   boot.kernel.sysctl = { "vm.swappiness" = 10;};
 
-  # Auto system update
-  system.autoUpgrade = {
-      enable = true;
-  };
-
-  # Automatic Garbage Collection
+  # Copy the NixOS configuration file and link it from the resulting system
+  # (/run/current-system/configuration.nix). This is useful in case you
+  # accidentally delete configuration.nix.
+  system.copySystemConfiguration = true;
+  system.autoUpgrade.enable = true;
   nix.gc = {
     automatic = true;
     dates = "weekly";
