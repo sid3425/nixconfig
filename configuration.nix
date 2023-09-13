@@ -118,7 +118,7 @@
       libsForQt5.plasma-browser-integration
       vivaldi
       vivaldi-ffmpeg-codecs
-      gparted
+      inkscape
     ];
   };
   programs = {
