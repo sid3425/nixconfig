@@ -12,20 +12,26 @@
     ];
 
   # Bootloader.
-  boot.loader = {
-    systemd-boot.enable = true;
-    efi.canTouchEfiVariables = true;
+  boot = {
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+    # Setup keyfile
+    initrd = {
+      secrets = {
+        "/crypto_keyfile.bin" = null;
+      };
+      # Enable swap on luks
+      luks.devices."luks-7dc8106d-ab52-4860-a335-b9eac77446bc" = {
+        device = "/dev/disk/by-uuid/7dc8106d-ab52-4860-a335-b9eac77446bc";
+        keyFile = "/crypto_keyfile.bin";
+      };
+    };
+    # Reduce swappiness
+    kernel.sysctl = { "vm.swappiness" = 10;};
   };
   
-  # Setup keyfile
-  boot.initrd.secrets = {
-    "/crypto_keyfile.bin" = null;
-  };
-
-  # Enable swap on luks
-  boot.initrd.luks.devices."luks-7dc8106d-ab52-4860-a335-b9eac77446bc".device = "/dev/disk/by-uuid/7dc8106d-ab52-4860-a335-b9eac77446bc";
-  boot.initrd.luks.devices."luks-7dc8106d-ab52-4860-a335-b9eac77446bc".keyFile = "/crypto_keyfile.bin";
-
   # Enable networking and firewall
   networking = {
     hostName = "hp-pavilion-gaming";
@@ -33,14 +39,21 @@
     firewall = {
       enable = true;
       allowedTCPPortRanges = [ 
-      { from = 1714; to = 1764; } # KDE Connect
+      { from = 1714; to = 25000; } # 1714 to 1716 for KDE Connect and 8384 to 22000 for Syncthing
       ];  
       allowedUDPPortRanges = [ 
-      { from = 1714; to = 1764; } # KDE Connect
+      { from = 1714; to = 25000; } # 1714 to 1716 for KDE Connect and 22000 to 21027 for Syncthing
       ];
     };
   };
-  hardware.bluetooth.enable = true;
+
+  # Hardware services such as Bluetooth and Sound
+  hardware = {
+    bluetooth.enable = true;
+    pulseaudio.enable = false;
+  };
+  sound.enable = true;
+  security.rtkit.enable = true;
   systemd.services.NetworkManager-wait-online.enable = false;
 
   # Select internationalisation properties.
@@ -59,7 +72,8 @@
       LC_TIME = "en_IN";
     };
   };
-
+  
+  # System services
   services = {
     xserver = {
       enable = true;
@@ -87,12 +101,17 @@
     dbus.packages = [ pkgs.libsForQt5.kpmcore ];
     #Flatpak
     flatpak.enable = true;
+    #Syncthing
+    syncthing = {
+        enable = true;
+        user = "sid";
+        dataDir = "/home/sid/Sync";    # Default folder for new synced folders
+        configDir = "/home/sid/Sync/.config/syncthing";   # Folder for Syncthing's settings and keys
+    };
+    #Auto-CPUFreq for power management on Laptops
+    auto-cpufreq.enable = true;
   };
-
-  # Enable sound with pipewire.
-  sound.enable = true;
-  hardware.pulseaudio.enable = false;
-  security.rtkit.enable = true;
+  programs.dconf.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.sid = {
@@ -100,25 +119,38 @@
     description = "Siddharth Saxena";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
+      #Internet and Media
       librewolf
+      vivaldi
+      spotify
+      discord
+      telegram-desktop
+      signal-desktop
+      zoom-us
+      megasync
+      qbittorrent
+      todoist-electron
+      bitwarden
+      #Graphics, Media and Editing
       krita
       obs-studio
       kdenlive
-      megasync
-      qbittorrent
-      veracrypt
-      steam
-      bitwarden
-      haruna
       tenacity
+      inkscape
+      haruna
+      #Tools
+      veracrypt
+      vivaldi-ffmpeg-codecs
       libreoffice-qt
       libsForQt5.kclock
       libsForQt5.kalk
       popsicle
       libsForQt5.plasma-browser-integration
-      vivaldi
-      vivaldi-ffmpeg-codecs
-      inkscape
+      libsForQt5.kwrited
+      libsForQt5.kate
+      appimage-run
+      #Gaming
+      steam
     ];
   };
   programs = {
@@ -137,9 +169,6 @@
       host.enable = true;
     };
   };
-
-  #Enable auto-cpufreq for power management
-  services.auto-cpufreq.enable = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -167,8 +196,9 @@
     zsh
     polkit
     pipx
-    appimage-run
     android-tools
+    syncthing
+    syncthing-tray
     inter
     jetbrains-mono
   ];
@@ -181,13 +211,8 @@
   #   enableSSHSupport = true;
   # };
 
-  # List services that you want to enable:
-
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
-
-  #Reduce swappiness
-  boot.kernel.sysctl = { "vm.swappiness" = 10;};
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
@@ -195,19 +220,12 @@
   system = {
     copySystemConfiguration = true;
     autoUpgrade.enable = true;
+    stateVersion = "23.05"; # Defines whether the base is based on the point releases or the unstable release
   };
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 2d";
   };
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
 
 }
