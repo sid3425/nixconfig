@@ -51,10 +51,15 @@
   hardware = {
     bluetooth.enable = true;
     pulseaudio.enable = false;
+    opengl.driSupport32Bit = true;
   };
   sound.enable = true;
   security.rtkit.enable = true;
   systemd.services.NetworkManager-wait-online.enable = false;
+  nix.settings = {
+    substituters = ["https://nix-gaming.cachix.org"];
+    trusted-public-keys = ["nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="];
+  };
 
   # Select internationalisation properties.
   time.timeZone = "Asia/Kolkata";
@@ -112,6 +117,7 @@
     auto-cpufreq.enable = true;
   };
   programs.dconf.enable = true;
+  programs.gamemode.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.sid = {
@@ -119,7 +125,7 @@
     description = "Siddharth Saxena";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-      #Internet and Media
+      # Internet and Media
       librewolf
       vivaldi
       spotify
@@ -131,14 +137,14 @@
       qbittorrent
       todoist-electron
       bitwarden
-      #Graphics, Media and Editing
+      # Graphics, Media and Editing
       krita
       obs-studio
       kdenlive
       tenacity
       inkscape
       haruna
-      #Tools
+      # Tools
       veracrypt
       vivaldi-ffmpeg-codecs
       libreoffice-qt
@@ -149,15 +155,28 @@
       libsForQt5.kwrited
       libsForQt5.kate
       appimage-run
-      #Gaming
+      vscode-fhs
+      # Gaming
       steam
+      steam-run
+      lutris
     ];
   };
   programs = {
     kdeconnect.enable = true;
     partition-manager.enable = true;
+    java.enable = true;
+    #Gaming
+    steam = {
+     enable = true;
+     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+    };
   };
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+    allowUnfreePredicate = (pkg: builtins.elem (builtins.parseDrvName pkg.name).name [ "steam" ]);
+  };
   users.extraGroups.vboxusers.members = [ "user-with-access-to-virtualbox" ];
   virtualisation = {
     podman = {
@@ -199,10 +218,28 @@
     android-tools
     syncthing
     syncthing-tray
-    inter
-    jetbrains-mono
+    gotop
   ];
 
+  fonts = {
+    fonts = with pkgs; [
+      inter
+      jetbrains-mono
+      font-awesome
+      noto-fonts
+      noto-fonts-cjk
+      noto-fonts-emoji
+      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    ];
+    fontconfig = {
+      enable = true;
+      defaultFonts = {
+        monospace = [ "JetBrainsMono Nerd Font Mono" ];
+	serif = [ "Noto Serif" "Inter" ];
+	sansSerif = [ "Noto Sans" "Inter"];
+      };
+    };
+  };
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
