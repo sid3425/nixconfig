@@ -12,14 +12,17 @@ This is my system configuration based on the [NixOS](https://nixos.org) Linux Di
 Alternatively, the files can be downloaded using the git command line tool with the command `git clone https://www.github.com/sid3425/mynixosconfig` provided git is installed on your system.
 
 # Features
-1. Hybrid graphics support with Nvidia GPUs for laptops(Change the PCI ID's specific to your integrated and dedicated GPUs in the `amd-nvidia.nix` file. If not needed, do not use the file and remove the link from the `configuration.nix` file)
-2. Containerization support using [Podman](https://docs.podman.io/en/latest/) and [Distrobox](https://github.com/89luca89/distrobox)
-3. Created a full desktop experience using the KDE Plasma desktop environment
-4. Developer friendly(ish) with packages such as gcc, python3, pip, git etc. are included ;)
-5. Support for newer Linux-focused technologies such as Flatpak and Wayland enabled by default
-6. Enabled firewall for overall better system security.
-7. Built in support for KDE Connect and Syncthing for better integration with other devices while respecting the user's privacy.
-8. Built in virtual machine support using VirtualBox for easy deployement of virtual machines.
+1. Hybrid graphics with offloading support for Nvidia GPUs on laptops(Change the PCI ID's specific to your integrated and dedicated GPUs in the `amd-nvidia.nix` file. If not needed, do not use the file and remove the link from the `configuration.nix` file)
+2. Sane defaults for
+   - Development, with many compilers, text editors such as [Neovim](https://neovim.io/), [VSCode](https://code.visualstudio.com/) and [Kate](https://kate-editor.org/) included as well as [Podman](https://podman.io/) and [Distrobox](https://github.com/89luca89/distrobox) for containerized environments
+   - Gaming with built in [Steam](https://store.steampowered.com/) and [Lutris](https://lutris.net) support
+   - Security, with enabled firewall and full disk encryption(make sure to set it up while installing NixOS beforehand)
+   - (VirtualBox)[https://virtualbox.org] for easier VM creation
+   - Privacy-respecting integration with other devices using Syncthing and KDE Connect
+   - Haruna(an mpv based media player), Elisa audio player and (Spotify)[https://spotify.com] for multimedia playback
+   - Graphics tools like (Inkscape)[https://inkscape.org], (Krita)[https://krita,org/en] and (OBS Studio)[https://obsproject.com] along with (Tenacity)[https://tenacityaudio.org] and (Kdenlive)[https://kdenlive.org/en] for audio and video editing respectively
+   - Productivity tools like (Todoist)[https://todoist.com], and (Librewolf)[https://librewolf.net] and (Vivaldi)[https://vivaldi.com] browsers integrated by default
+   - And many more!
 
 # Requirements
 The NixOS Linux distribution should be installed either in a VM or on bare metal. An active internet connection is required to install both the base OS and for the configuration to apply correctly.
