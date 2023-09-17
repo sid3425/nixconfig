@@ -26,3 +26,7 @@ Alternatively, the files can be downloaded using the git command line tool with 
 
 # Requirements
 The NixOS Linux distribution should be installed either in a VM or on bare metal. An active internet connection is required to install both the base OS and for the configuration to apply correctly.
+
+# References
+1. [Chris Titus Tech's NixOS configuration](https://github.com/ChrisTitusTech/nixos-titus)
+2. [NixOS wiki](https://nixos.wiki/)
