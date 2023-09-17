@@ -17,11 +17,11 @@ Alternatively, the files can be downloaded using the git command line tool with 
    - Development, with many compilers, text editors such as [Neovim](https://neovim.io/), [VSCode](https://code.visualstudio.com/) and [Kate](https://kate-editor.org/) included as well as [Podman](https://podman.io/) and [Distrobox](https://github.com/89luca89/distrobox) for containerized environments
    - Gaming with built in [Steam](https://store.steampowered.com/) and [Lutris](https://lutris.net) support
    - Security, with enabled firewall and full disk encryption(make sure to set it up while installing NixOS beforehand)
-   - (VirtualBox)[https://virtualbox.org] for easier VM creation
+   - [VirtualBox](https://virtualbox.org] for easier VM creation
    - Privacy-respecting integration with other devices using Syncthing and KDE Connect
-   - Haruna(an mpv based media player), Elisa audio player and (Spotify)[https://spotify.com] for multimedia playback
-   - Graphics tools like (Inkscape)[https://inkscape.org], (Krita)[https://krita,org/en] and (OBS Studio)[https://obsproject.com] along with (Tenacity)[https://tenacityaudio.org] and (Kdenlive)[https://kdenlive.org/en] for audio and video editing respectively
-   - Productivity tools like (Todoist)[https://todoist.com], and (Librewolf)[https://librewolf.net] and (Vivaldi)[https://vivaldi.com] browsers integrated by default
+   - Haruna(an mpv based media player), Elisa audio player and [Spotify](https://spotify.com) for multimedia playback
+   - Graphics tools like [Inkscape](https://inkscape.org), [Krita](https://krita,org/en) and [OBS Studio](https://obsproject.com) along with [Tenacity](https://tenacityaudio.org) and [Kdenlive](https://kdenlive.org/en) for audio and video editing respectively
+   - Productivity tools like [Todoist](https://todoist.com), and [Librewolf](https://librewolf.net) and [Vivaldi](https://vivaldi.com) browsers integrated by default
    - And many more!
 
 # Requirements
