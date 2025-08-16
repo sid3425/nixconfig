@@ -1,4 +1,4 @@
-### Note: This project should mainly be used as a reference if you are learning how NixOS and/or the Nix package manager works. You can use it on your own systems, however I do not guarantee it will work 100% unless modifications specific to your system are made.
+### Note: This project should mainly be used as a reference if you are learning how NixOS and/or the Nix package manager works. You can use it on your own systems, however I do not guarantee it will work 100% unless modifications specific to your system are made. Also, this readme is rather out of date with my older configuration, this will be updated soon.
 
 This is my system configuration based on the [NixOS](https://nixos.org) Linux Distribution. While this configuration is specific to my use cases and my current hardware, I would suggest to change the configs based on your use cases.
 
