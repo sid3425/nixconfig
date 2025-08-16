@@ -1,67 +1,52 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+{ config, pkgs, lib, inputs, ... }:
 
-{ config, pkgs, ... }:
-
-{  
+{
   imports =
     [
       ./hardware-configuration.nix
-      ./amd-nvidia.nix
+      inputs.home-manager.nixosModules.default
     ];
 
-  # Bootloader.
   boot = {
     loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
-    # Setup keyfile
-    initrd = {
-      secrets = {
-        "/crypto_keyfile.bin" = null;
-      };
-      # Enable swap on luks
-      luks.devices."luks-7dc8106d-ab52-4860-a335-b9eac77446bc" = {
-        device = "/dev/disk/by-uuid/7dc8106d-ab52-4860-a335-b9eac77446bc";
-        keyFile = "/crypto_keyfile.bin";
+    kernel.sysctl = { "vm.swappiness" = 10;};
+    kernelPackages = pkgs.linuxPackages_latest;
+    kernelParams = [ "apparmor=1" ];
+  };
+
+  security = {
+    apparmor.enable = true;
+    rtkit.enable = true;
+    lsm = [ "apparmor" ];
+  };
+
+  hardware.bluetooth = {
+  enable = true;
+  powerOnBoot = true;
+  settings = {
+    General = {
+      Experimental = true; # Show battery charge of Bluetooth devices
       };
     };
-    # Reduce swappiness
-    kernel.sysctl = { "vm.swappiness" = 10;};
   };
-  
-  # Enable networking and firewall
+
   networking = {
-    hostName = "hp-pavilion-gaming";
+    hostName = "helloworld";
     networkmanager.enable = true;
     firewall = {
       enable = true;
-      allowedTCPPortRanges = [ 
+      allowedTCPPortRanges = [
       { from = 1714; to = 25000; } # 1714 to 1716 for KDE Connect and 8384 to 22000 for Syncthing
-      ];  
-      allowedUDPPortRanges = [ 
+      ];
+      allowedUDPPortRanges = [
       { from = 1714; to = 25000; } # 1714 to 1716 for KDE Connect and 22000 to 21027 for Syncthing
       ];
     };
   };
 
-  # Hardware services such as Bluetooth and Sound
-  hardware = {
-    bluetooth.enable = true;
-    pulseaudio.enable = false;
-    opengl.driSupport32Bit = true;
-  };
-  sound.enable = true;
-  security.rtkit.enable = true;
-  systemd.services.NetworkManager-wait-online.enable = false;
-  nix.settings = {
-    substituters = ["https://nix-gaming.cachix.org"];
-    trusted-public-keys = ["nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="];
-  };
-
-  # Select internationalisation properties.
   time.timeZone = "Asia/Kolkata";
   i18n = {
     defaultLocale = "en_IN";
@@ -78,18 +63,19 @@
     };
   };
   
-  # System services
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   services = {
+    gvfs.enable = true;
+    displayManager.sddm.enable = true;
+    desktopManager.plasma6.enable = true;
     xserver = {
-      enable = true;
-      displayManager.sddm.enable = true;
-      desktopManager.plasma5.enable = true;
-      displayManager.defaultSession = "plasmawayland";
-      layout = "us";
-      xkbVariant = "";
-      libinput.enable = true;
+      xkb = {
+        layout = "us";
+        variant = "";
+      };
     };
-    #Audio
+    libinput.enable = true;
     pipewire = {
       enable = true;
       alsa.enable = true;
@@ -98,86 +84,53 @@
       jack.enable = true;
       wireplumber.enable = true;
     };
-    #Printing
     printing.enable = true;
-    #Udev Packages
-    udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
-    #DBus packages
+    udev.packages = with pkgs; [ pkgs.gnome-settings-daemon ];
     dbus.packages = [ pkgs.libsForQt5.kpmcore ];
-    #Flatpak
     flatpak.enable = true;
-    #Syncthing
-    syncthing = {
-        enable = true;
-        user = "sid";
-        dataDir = "/home/sid/Sync";    # Default folder for new synced folders
-        configDir = "/home/sid/Sync/.config/syncthing";   # Folder for Syncthing's settings and keys
-    };
-    #Auto-CPUFreq for power management on Laptops
-    auto-cpufreq.enable = true;
-  };
-  programs.dconf.enable = true;
-  programs.gamemode.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.sid = {
-    isNormalUser = true;
-    description = "Siddharth Saxena";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      # Internet and Media
-      librewolf
-      vivaldi
-      spotify
-      discord
-      telegram-desktop
-      signal-desktop
-      zoom-us
-      megasync
-      qbittorrent
-      todoist-electron
-      bitwarden
-      # Graphics, Media and Editing
-      krita
-      obs-studio
-      kdenlive
-      tenacity
-      inkscape
-      haruna
-      # Tools
-      veracrypt
-      vivaldi-ffmpeg-codecs
-      libreoffice-qt
-      libsForQt5.kclock
-      libsForQt5.kalk
-      popsicle
-      libsForQt5.plasma-browser-integration
-      libsForQt5.kwrited
-      libsForQt5.kate
-      appimage-run
-      vscode-fhs
-      # Gaming
-      steam
-      steam-run
-      lutris
-    ];
   };
   programs = {
+    appimage.enable = true;
+    appimage.binfmt = true;
+    dconf.enable = true;
     kdeconnect.enable = true;
     partition-manager.enable = true;
     java.enable = true;
-    #Gaming
-    steam = {
-     enable = true;
-     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+    firefox.enable = true;
+    nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+      ];
     };
   };
-  nixpkgs.config = {
-    allowUnfree = true;
-    allowUnfreePredicate = (pkg: builtins.elem (builtins.parseDrvName pkg.name).name [ "steam" ]);
+
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  xdg.portal.config.common.default = "gtk";
+
+  users = {
+    users.johnwick = {
+      isNormalUser = true;
+      description = "JohnWick";
+      extraGroups = [ "networkmanager" "wheel" "vboxusers" ];
+      packages = with pkgs; [
+        kdePackages.kate
+        brave
+	qbittorrent
+	libreoffice-qt
+	appimage-run
+	vlc
+      ];
+    };
+    extraGroups.vboxusers.members = [ "user-with-access-to-virtualbox" ];
   };
-  users.extraGroups.vboxusers.members = [ "user-with-access-to-virtualbox" ];
+
+  home-manager = {
+    extraSpecialArgs = {inherit inputs; };
+    users = {
+      "johnwick" = import ./home-manager/home.nix;
+    };
+  };
+
   virtualisation = {
     podman = {
       enable = true;
@@ -189,80 +142,27 @@
     };
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  nixpkgs.config.allowUnfree = true;
+
   environment.systemPackages = with pkgs; [
     neovim
     wget
-    curl
-    python3
-    gcc
     distrobox
-    neofetch
-    git
-    gitRepo
-    gnupg
-    autoconf
-    procps
-    gnumake
+    curl
     util-linux
-    m4
-    gperf
-    unzip
-    ncurses5
-    stdenv.cc
-    binutils
-    zsh
-    polkit
-    pipx
     android-tools
-    syncthing
-    syncthing-tray
-    gotop
+    fastfetch
+    apparmor-utils
+    apparmor-bin-utils
   ];
 
-  fonts = {
-    fonts = with pkgs; [
-      inter
-      jetbrains-mono
-      font-awesome
-      noto-fonts
-      noto-fonts-cjk
-      noto-fonts-emoji
-      (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-    ];
-    fontconfig = {
-      enable = true;
-      defaultFonts = {
-        monospace = [ "JetBrainsMono Nerd Font Mono" ];
-	serif = [ "Noto Serif" "Inter" ];
-	sansSerif = [ "Noto Sans" "Inter"];
-      };
-    };
-  };
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
   system = {
-    copySystemConfiguration = true;
+    stateVersion = "25.05";
     autoUpgrade.enable = true;
-    stateVersion = "23.05"; # Defines whether the base is based on the point releases or the unstable release
   };
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 2d";
   };
-
 }
